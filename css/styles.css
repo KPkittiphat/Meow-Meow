@@ -1,0 +1,284 @@
+:root{
+  --max-width:1200px;
+  --accent:#ff7a59;
+  --overlay-bg: rgba(0,0,0,0.45);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+
+body{
+  /* แก้ชื่อไฟล์/นามสกุลให้ตรงกับรูปของคุณ (bg.jpg / bg.png / bg.webp) */
+  background-image: url("../img/bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* บางมือถือไม่รองรับ fixed ดี ให้เปิดใช้เฉพาะ desktop ถ้าต้องการ */
+  background-attachment: scroll;
+  min-height:100vh;
+  color: #fff;
+}
+
+/* อ่านง่ายบนพื้นหลังภาพ */
+.site-overlay{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: clamp(12px, 3vh, 32px); /* เว้นพื้นที่ด้านบน/ล่างบนจอเล็ก */
+  background:transparent;
+  user-select:none;
+}
+
+/* รูป meow จะแสดงตรงกลางเสมอ */
+.meow-img{
+  width: clamp(160px, 42vmin, 520px); /* ตัวอย่าง: ไม่เล็กกว่า 160px ไม่ใหญ่กว่า 520px */
+  height: auto;
+  cursor:pointer;
+  display:block;
+  box-shadow:none;        /* เอาเงาออก */
+  border-radius:0;       /* เอามุมโค้งออก */
+  border: none;          /* เอากรอบเส้นออก */
+  background:transparent;/* ไม่มีพื้นหลังรอบรูป */
+  transition:transform .12s ease;
+}
+
+/* ข้อความหน้าเพจ (Moew Meow) ปรับขนาด และไม่ตัดบรรทัด */
+.page-label{
+  position:fixed;
+  top: clamp(8px, 2.2vh, 18px);
+  left:50%;
+  transform:translateX(-50%);
+  color:#fff;
+  font-weight:800;
+  font-size: clamp(0.95rem, 4.2vw, 2.4rem); /* ยืดหยุ่นตามหน้าจอ */
+  line-height:1;
+  white-space:nowrap;
+  text-shadow: 0 3px 14px rgba(0,0,0,0.55);
+  pointer-events:none;
+  user-select:none;
+  z-index:10000;
+  opacity:0.95;
+  padding: 6px 10px;
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+/* ป้ายคะแนน เมื่ออยู่นอก .meow-wrap (วางกลางด้านบนของรูป) */
+.site-overlay .score-badge{
+  position:absolute;
+  /* top ห่างจากบนหน้าจอโดยยึดกับขนาดภาพ: ใช้ calc ร่วม vh เพื่อความยืดหยุ่น */
+  top: clamp(6vh, 10vh, 14vh);
+  left:50%;
+  transform:translateX(-50%);
+  background: rgba(0,0,0,0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color:#fff;
+  padding: clamp(6px, 1.2vh, 12px) clamp(10px, 2vw, 18px);
+  border-radius:999px;
+  font-weight:800;
+  font-size: clamp(1rem, 2.2vw, 1.4rem);
+  min-width:56px;
+  max-width:160px;
+  text-align:center;
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.45);
+  z-index:999;
+  pointer-events:none;
+  user-select:none;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* ยังคงมีสไตล์สำหรับกรณีถ้าป้ายอยู่ภายใน .meow-wrap */
+.meow-wrap .score-badge{
+  position:absolute;
+  top: clamp(8px, 6%, 18px);
+  left:50%;
+  transform:translateX(-50%);
+}
+
+/* ป้ายคะแนน มุมขวาบน (fixed) */
+.score-badge{
+  position:fixed;
+  top:16px;
+  right:16px;
+  background: rgba(0,0,0,0.45);        /* โปร่งใสพอประมาณ */
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);          /* เบลอพื้นหลังเล็กน้อย */
+  color:#fff;
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:5rem;
+  min-width:44px;
+  text-align:center;
+  border: 1px solid rgba(255,255,255,0.12); /* ขอบบางๆ */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);   /* เงาลึกขึ้น */
+  z-index:9999;
+  pointer-events:none;
+  user-select:none;
+  transition: transform .12s ease, background .12s ease, box-shadow .12s ease;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.35);
+}
+/* รองรับหน้าจอเล็ก */
+@media (max-width:420px){
+  .meow-img{ max-width:80vmin; max-height:80vmin; }
+  .score-badge{ top:12px; right:12px; padding:6px 10px; font-size:14px; }
+}
+
+/* wrapper รอบรูป เพื่อให้ป้ายคะแนนวางตำแหน่งแบบ absolute */
+.meow-wrap{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  max-width:var(--max-width);
+  margin:0 auto;
+}
+
+/* ปรับสไตล์ป้ายคะแนน ให้อยู่บนหัวรูป ขนาดพอดี ไม่ยืดยาว */
+.meow-wrap .score-badge{
+  position:absolute;
+  top:8px;                       /* ระยะจากขอบบนของรูป ปรับได้ตามต้องการ */
+  left:50%;
+  transform:translateX(-50%);
+  background: rgba(0,0,0,0.45);  /* โปร่งใสเล็กน้อย */
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color:#fff;
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:0.95rem;
+  width:auto;
+  min-width:40px;
+  max-width:110px;               /* จำกัดความยาวไม่ให้เป็นแท่งยาว */
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  overflow:hidden;
+  text-align:center;
+  border: 1px solid rgba(255,255,255,0.12); /* ขอบบางๆ */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.45);   /* เงา */
+  z-index:999;
+  pointer-events:none;           /* ให้คลิกทะลุไปที่รูปได้ */
+  user-select:none;
+}
+
+/* ปรับขนาดบนมือถือ */
+@media (max-width:420px){
+  .meow-img{ max-width:80vmin; max-height:80vmin; }
+  .meow-wrap .score-badge{ top:6px; padding:5px 8px; font-size:14px; min-width:36px; max-width:90px; }
+}
+
+/* layout พื้นฐาน */
+html,body{
+  height:100%;
+  margin:0;
+  font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* ครอบจอและจัดกึ่งกลางแบบตอบสนอง */
+.site-overlay{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: clamp(12px, 3vh, 32px); /* เว้นพื้นที่ด้านบน/ล่างบนจอเล็ก */
+  background:transparent;
+  user-select:none;
+}
+
+/* ตัวอย่าง header / hero */
+.site-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: clamp(8px, 2vw, 20px);
+}
+.site-header h1{font-size:clamp(1rem, 2.5vw, 1.4rem); margin:0}
+.main-nav a{color:#fff;text-decoration:none;margin-left:16px;font-size:clamp(0.85rem,1.6vw,1rem)}
+
+.hero{
+  text-align:center;
+  padding: clamp(20px, 8vw, 80px) 16px;
+}
+.hero h2{font-size:clamp(1.6rem, 4.5vw, 3rem); margin:0 0 12px}
+.hero p{font-size:clamp(1rem,2.4vw,1.25rem); margin:0 0 18px}
+
+.btn{
+  display:inline-block;
+  background:var(--accent);
+  color:#fff;
+  padding: 0.6em 1.2em;
+  border-radius:8px;
+  text-decoration:none;
+  font-weight:600;
+}
+
+/* Footer */
+.site-footer{padding:12px;text-align:center;font-size:0.9rem}
+
+/* ข้อความแสดงหน้าเพจแบบเรียบ ๆ — อยู่ตรงกลางด้านบนเหนือรูป */
+.page-label{
+  position:fixed;
+  top:12px;
+  left:50%;
+  transform:translateX(-50%);
+  color:#fff;
+  font-weight:700;
+  font-size:3rem;
+  letter-spacing:0.4px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  pointer-events:none;
+  user-select:none;
+  z-index:10000;
+  opacity:0.95;
+}
+
+/* ปรับป้ายคะแนนให้เหลือเฉพาะตัวเลข (เหมือนเดิม) */
+.score-badge .score-value{
+  display:block;
+  font-size:1.25rem;
+  font-weight:900;
+  line-height:1;
+}
+
+/* รีสปอนซีฟสำหรับมือถือ */
+@media (max-width:420px){
+  .page-label{ top:8px; font-size:0.9rem; }
+  .site-overlay .score-badge{ top:10vh; padding:8px 10px; font-size:0.9rem; max-width:110px; }
+  .score-badge .score-value{ font-size:1.05rem; }
+  .meow-img{ max-width:80vmin; max-height:80vmin; }
+}
+
+/* ตัวอย่าง media queries เพิ่มเติม */
+@media (max-width:600px){
+  .main-nav{display:none} /* ซ่อน nav บนมือถือ ตัวอย่าง */
+  .site-header{padding:12px}
+  .hero{padding:28px 12px}
+}
+
+/* ถ้าต้องการ background fixed เฉพาะ desktop */
+@media (min-width:1024px){
+  body{background-attachment:fixed}
+}
+
+/* ปรับสำหรับหน้าจอเล็กมาก (มือถือแนวตั้ง) */
+@media (max-width:420px){
+  .site-overlay{ padding:12px; }
+  .meow-img{ width: clamp(140px, 56vmin, 360px); }
+  .page-label{ top:8px; font-size: clamp(0.9rem, 6.5vw, 1.6rem); padding:4px 8px; }
+  .site-overlay .score-badge{ top: calc(8vh); padding:6px 10px; font-size:1rem; max-width:120px; }
+}
+
+/* ปรับสำหรับจอใหญ่มาก */
+@media (min-width:1400px){
+  .meow-img{ width: clamp(220px, 36vmin, 720px); }
+  .site-overlay .score-badge{ top:12vh; font-size:1.5rem; max-width:200px; }
+}
